@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata; // Asegúrate de tener este using
 
 namespace GLS.Platform.u202323562.Contexts.Shared.Infrastructure.Persistence.Strategies;
 
@@ -10,23 +11,30 @@ public static class SnakeCaseNamingStrategy
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
             // 1. Renombrar Tablas
-            // IMPORTANTE: Ignorar entidades 'Owned' (como MacAddress) para evitar conflictos de tabla compartida.
             var tableName = entity.GetTableName();
             if (tableName != null && !entity.IsOwned())
             {
                 entity.SetTableName(ToSnakeCase(tableName));
             }
-            
+
             // 2. Renombrar Columnas
             foreach (var property in entity.GetProperties())
             {
+                // --- LA CORRECCIÓN CLAVE ESTÁ AQUÍ ---
+                // Si es una entidad Owned (como MacAddress) y es su Primary Key,
+                // NO la renombres. Deja que EF use la columna del dueño ('id').
+                if (entity.IsOwned() && property.IsPrimaryKey())
+                {
+                    continue; 
+                }
+                // -------------------------------------
+
                 var columnName = property.GetColumnName();
                 if (columnName != null)
                 {
                     property.SetColumnName(ToSnakeCase(columnName));
                 }
             }
-            
         }
     }
 
