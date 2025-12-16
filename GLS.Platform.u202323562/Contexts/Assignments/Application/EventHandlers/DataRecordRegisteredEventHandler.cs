@@ -1,26 +1,48 @@
-﻿using GLS.Platform.u202323562.Contexts.Assignments.Domain.Commands;
-using GLS.Platform.u202323562.Contexts.Assignments.Domain.Services;
-using GLS.Platform.u202323562.Contexts.Shared.Domain.Events;
+﻿using GLS.Platform.u202323562.Contexts.Assignments.Domain.Repositories;
+using GLS.Platform.u202323562.Contexts.Shared.Domain.Repositories;
+using GLS.Platform.u202323562.Contexts.Tracking.Domain.Events;
 
 namespace GLS.Platform.u202323562.Contexts.Assignments.Application.EventHandlers;
 
 /// <summary>
-/// Event handler that listens to DataRecordRegisteredEvent and updates device preferred thrust
+/// Event handler that listens to DataRecordRegisteredEvent and updates device preferred thrust.
 /// </summary>
 /// <remarks>
 /// When a data record is registered in the TRACKING context, this handler updates
 /// the preferred thrust of the corresponding device in ASSIGNMENTS context if the value differs.
-/// Implemented by Oliver Villogas Medina (u202323562)
+/// Author: [Tu Nombre Completo]
 /// </remarks>
-public class DataRecordRegisteredEventHandler(IDeviceCommandService deviceCommandService)
+public class DataRecordRegisteredEventHandler
 {
-    public async Task HandleAsync(DataRecordRegisteredEvent @event)
+    private readonly IDeviceRepository _deviceRepository;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public DataRecordRegisteredEventHandler(
+        IDeviceRepository deviceRepository,
+        IUnitOfWork unitOfWork)
     {
-        var command = new UpdatePreferredThrustCommand(
-            @event.DeviceMacAddress,
-            @event.TargetThrust
-        );
+        _deviceRepository = deviceRepository;
+        _unitOfWork = unitOfWork;
+    }
+
+    /// <summary>
+    /// Handles the DataRecordRegisteredEvent by updating device preferred thrust.
+    /// </summary>
+    /// <param name="event">Event containing device MAC address and target thrust</param>
+    public async Task Handle(DataRecordRegisteredEvent @event)
+    {
+        // Find device by MAC Address
+        var device = await _deviceRepository.FindByMacAddressAsync(@event.DeviceMacAddress);
         
-        await deviceCommandService.Handle(command);
+        if (device == null)
+            return; // Device not found, ignore event silently
+
+        // Only update if thrust value is different
+        if (device.PreferredThrust != @event.TargetThrust)
+        {
+            device.UpdatePreferredThrust(@event.TargetThrust);
+            _deviceRepository.Update(device);
+            await _unitOfWork.CompleteAsync();
+        }
     }
 }

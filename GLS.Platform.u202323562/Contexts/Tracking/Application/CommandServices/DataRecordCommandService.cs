@@ -1,4 +1,5 @@
-﻿using GLS.Platform.u202323562.Contexts.Shared.Domain.Events;
+﻿using Cortex.Mediator;
+using GLS.Platform.u202323562.Contexts.Shared.Domain.Events;
 using GLS.Platform.u202323562.Contexts.Shared.Domain.Model.ValueObjects;
 using GLS.Platform.u202323562.Contexts.Shared.Domain.Repositories;
 using GLS.Platform.u202323562.Contexts.Tracking.Domain.Commands;
@@ -15,18 +16,32 @@ namespace GLS.Platform.u202323562.Contexts.Tracking.Application.CommandServices;
 /// </summary>
 /// <remarks>
 /// Validates device existence through ACL before creating records.
-/// Emits DataRecordRegisteredEvent for inter-context communication.
+/// Emits DataRecordRegisteredEvent for inter-context communication using Cortex.Mediator.
 /// Implemented by Oliver Villogas Medina (u202323562)
 /// </remarks>
-public class DataRecordCommandService(
-    IDataRecordRepository dataRecordRepository,
-    IAssignmentsContextFacade assignmentsContextFacade,
-    IDomainEventPublisher eventPublisher,
-    IUnitOfWork unitOfWork) : IDataRecordCommandService
+public class DataRecordCommandService : IDataRecordCommandService
 {
+    private readonly IDataRecordRepository _dataRecordRepository;
+    private readonly IAssignmentsContextFacade _assignmentsContextFacade;
+    private readonly IMediator _mediator;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public DataRecordCommandService(
+        IDataRecordRepository dataRecordRepository,
+        IAssignmentsContextFacade assignmentsContextFacade,
+        IMediator mediator,
+        IUnitOfWork unitOfWork)
+    {
+        _dataRecordRepository = dataRecordRepository;
+        _assignmentsContextFacade = assignmentsContextFacade;
+        _mediator = mediator;
+        _unitOfWork = unitOfWork;
+    }
+
     public async Task<DataRecord> Handle(CreateDataRecordCommand command)
     {
-        var deviceExists = await assignmentsContextFacade.DeviceExistsByMacAddressAsync(command.DeviceMacAddress);
+        // Validate device exists through ACL
+        var deviceExists = await _assignmentsContextFacade.DeviceExistsByMacAddressAsync(command.DeviceMacAddress);
         
         if (!deviceExists)
             throw InvalidDataRecordException.DeviceNotFound(command.DeviceMacAddress);
@@ -42,15 +57,16 @@ public class DataRecordCommandService(
             command.GeneratedAt
         );
         
-        await dataRecordRepository.AddAsync(dataRecord);
-        await unitOfWork.CompleteAsync();
+        await _dataRecordRepository.AddAsync(dataRecord);
+        await _unitOfWork.CompleteAsync();
         
+        // Emit integration event using Cortex.Mediator
         var domainEvent = new DataRecordRegisteredEvent(
             command.DeviceMacAddress,
             command.TargetThrust
         );
         
-        await eventPublisher.PublishAsync(domainEvent);
+        await _mediator.Publish(domainEvent);
 
         return dataRecord;
     }

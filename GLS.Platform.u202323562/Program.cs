@@ -1,18 +1,19 @@
+using Cortex.Mediator;
 using GLS.Platform.u202323562.Contexts.Assignments.Application.CommandServices;
-using GLS.Platform.u202323562.Contexts.Shared.Infrastructure.Persistence.Configuration;
-using GLS.Platform.u202323562.Contexts.Tracking.Application.CommandServices;
-using GLS.Platform.u202323562.Contexts.Tracking.Domain.Repositories;
-using GLS.Platform.u202323562.Contexts.Tracking.Domain.Services;
-using GLS.Platform.u202323562.Contexts.Tracking.Infrastructure.Persistence.Repositories;
-using GLS.Platform.u202323562.Contexts.Tracking.Interfaces.REST.ACL.Services;
 using GLS.Platform.u202323562.Contexts.Assignments.Application.EventHandlers;
 using GLS.Platform.u202323562.Contexts.Assignments.Application.QueryServices;
 using GLS.Platform.u202323562.Contexts.Assignments.Domain.Repositories;
 using GLS.Platform.u202323562.Contexts.Assignments.Domain.Services;
 using GLS.Platform.u202323562.Contexts.Assignments.Infrastructure.Persistence.Repositories;
 using GLS.Platform.u202323562.Contexts.Shared.Domain.Repositories;
+using GLS.Platform.u202323562.Contexts.Shared.Infrastructure.Persistence.Configuration;
 using GLS.Platform.u202323562.Contexts.Shared.Infrastructure.Repositories;
+using GLS.Platform.u202323562.Contexts.Tracking.Application.CommandServices;
+using GLS.Platform.u202323562.Contexts.Tracking.Domain.Repositories;
+using GLS.Platform.u202323562.Contexts.Tracking.Domain.Services;
+using GLS.Platform.u202323562.Contexts.Tracking.Infrastructure.Persistence.Repositories;
 using GLS.Platform.u202323562.Contexts.Tracking.Interfaces.REST.ACL;
+using GLS.Platform.u202323562.Contexts.Tracking.Interfaces.REST.ACL.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -53,18 +54,27 @@ builder.Services.AddDbContext<GLSContext>(options =>
             .EnableDetailedErrors();
 });
 
+// Cortex.Mediator - IMPORTANTE: Registrar antes de los servicios
+builder.Services.AddMediator(options =>
+{
+    // Register event handlers from the assembly
+    options.AddEventHandlersFromAssembly(typeof(DataRecordRegisteredEventHandler).Assembly);
+});
+
 // Shared
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-// Tracking
+// Tracking Context
 builder.Services.AddScoped<IDataRecordRepository, DataRecordRepository>();
 builder.Services.AddScoped<IDataRecordCommandService, DataRecordCommandService>();
 builder.Services.AddScoped<IAssignmentsContextFacade, AssignmentsContextFacade>();
 
-// Assignments
+// Assignments Context
 builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
 builder.Services.AddScoped<IDeviceQueryService, DeviceQueryService>();
 builder.Services.AddScoped<IDeviceCommandService, DeviceCommandService>();
+
+// Event Handler - IMPORTANTE: Registrar explícitamente
 builder.Services.AddScoped<DataRecordRegisteredEventHandler>();
 
 var app = builder.Build();
