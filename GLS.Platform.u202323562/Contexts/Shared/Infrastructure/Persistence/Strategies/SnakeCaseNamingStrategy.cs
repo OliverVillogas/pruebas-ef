@@ -9,12 +9,15 @@ public static class SnakeCaseNamingStrategy
     {
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
+            // 1. Renombrar Tablas
+            // IMPORTANTE: Ignorar entidades 'Owned' (como MacAddress) para evitar conflictos de tabla compartida.
             var tableName = entity.GetTableName();
-            if (tableName != null)
+            if (tableName != null && !entity.IsOwned())
             {
                 entity.SetTableName(ToSnakeCase(tableName));
             }
             
+            // 2. Renombrar Columnas
             foreach (var property in entity.GetProperties())
             {
                 var columnName = property.GetColumnName();
@@ -24,32 +27,6 @@ public static class SnakeCaseNamingStrategy
                 }
             }
             
-            foreach (var key in entity.GetKeys())
-            {
-                var keyName = key.GetName();
-                if (keyName != null)
-                {
-                    key.SetName(ToSnakeCase(keyName));
-                }
-            }
-            
-            foreach (var foreignKey in entity.GetForeignKeys())
-            {
-                var foreignKeyName = foreignKey.GetConstraintName();
-                if (foreignKeyName != null)
-                {
-                    foreignKey.SetConstraintName(ToSnakeCase(foreignKeyName));
-                }
-            }
-            
-            foreach (var index in entity.GetIndexes())
-            {
-                var indexName = index.GetDatabaseName();
-                if (indexName != null)
-                {
-                    index.SetDatabaseName(ToSnakeCase(indexName));
-                }
-            }
         }
     }
 
