@@ -1,4 +1,5 @@
-﻿using GLS.Platform.u202323562.Contexts.Assignments.Domain.Repositories;
+﻿using MediatR;
+using GLS.Platform.u202323562.Contexts.Assignments.Domain.Repositories;
 using GLS.Platform.u202323562.Contexts.Shared.Domain.Repositories;
 using GLS.Platform.u202323562.Contexts.Tracking.Domain.Events;
 
@@ -10,9 +11,9 @@ namespace GLS.Platform.u202323562.Contexts.Assignments.Application.EventHandlers
 /// <remarks>
 /// When a data record is registered in the TRACKING context, this handler updates
 /// the preferred thrust of the corresponding device in ASSIGNMENTS context if the value differs.
-/// Author: [Tu Nombre Completo]
+/// Author: Oliver Villogas Medina (u202323562)
 /// </remarks>
-public class DataRecordRegisteredEventHandler
+public class DataRecordRegisteredEventHandler : INotificationHandler<DataRecordRegisteredEvent>
 {
     private readonly IDeviceRepository _deviceRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -28,19 +29,20 @@ public class DataRecordRegisteredEventHandler
     /// <summary>
     /// Handles the DataRecordRegisteredEvent by updating device preferred thrust.
     /// </summary>
-    /// <param name="event">Event containing device MAC address and target thrust</param>
-    public async Task Handle(DataRecordRegisteredEvent @event)
+    /// <param name="notification">Event containing device MAC address and target thrust</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    public async Task Handle(DataRecordRegisteredEvent notification, CancellationToken cancellationToken)
     {
         // Find device by MAC Address
-        var device = await _deviceRepository.FindByMacAddressAsync(@event.DeviceMacAddress);
+        var device = await _deviceRepository.FindByMacAddressAsync(notification.DeviceMacAddress);
         
         if (device == null)
             return; // Device not found, ignore event silently
 
         // Only update if thrust value is different
-        if (device.PreferredThrust != @event.TargetThrust)
+        if (device.PreferredThrust != notification.TargetThrust)
         {
-            device.UpdatePreferredThrust(@event.TargetThrust);
+            device.UpdatePreferredThrust(notification.TargetThrust);
             _deviceRepository.Update(device);
             await _unitOfWork.CompleteAsync();
         }

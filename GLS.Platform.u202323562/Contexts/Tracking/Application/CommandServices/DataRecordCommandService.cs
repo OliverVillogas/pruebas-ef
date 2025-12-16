@@ -1,8 +1,8 @@
-﻿using Cortex.Mediator;
-using GLS.Platform.u202323562.Contexts.Shared.Domain.Events;
+﻿using MediatR;
 using GLS.Platform.u202323562.Contexts.Shared.Domain.Model.ValueObjects;
 using GLS.Platform.u202323562.Contexts.Shared.Domain.Repositories;
 using GLS.Platform.u202323562.Contexts.Tracking.Domain.Commands;
+using GLS.Platform.u202323562.Contexts.Tracking.Domain.Events;
 using GLS.Platform.u202323562.Contexts.Tracking.Domain.Exceptions;
 using GLS.Platform.u202323562.Contexts.Tracking.Domain.Model.Aggregates;
 using GLS.Platform.u202323562.Contexts.Tracking.Domain.Repositories;
@@ -16,7 +16,7 @@ namespace GLS.Platform.u202323562.Contexts.Tracking.Application.CommandServices;
 /// </summary>
 /// <remarks>
 /// Validates device existence through ACL before creating records.
-/// Emits DataRecordRegisteredEvent for inter-context communication using Cortex.Mediator.
+/// Emits DataRecordRegisteredEvent for inter-context communication using MediatR.
 /// Implemented by Oliver Villogas Medina (u202323562)
 /// </remarks>
 public class DataRecordCommandService : IDataRecordCommandService
@@ -60,7 +60,7 @@ public class DataRecordCommandService : IDataRecordCommandService
         await _dataRecordRepository.AddAsync(dataRecord);
         await _unitOfWork.CompleteAsync();
         
-        // Emit integration event using Cortex.Mediator
+        // Emit integration event using MediatR
         var domainEvent = new DataRecordRegisteredEvent(
             command.DeviceMacAddress,
             command.TargetThrust

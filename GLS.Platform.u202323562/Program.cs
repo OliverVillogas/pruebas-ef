@@ -1,6 +1,4 @@
-using Cortex.Mediator;
 using GLS.Platform.u202323562.Contexts.Assignments.Application.CommandServices;
-using GLS.Platform.u202323562.Contexts.Assignments.Application.EventHandlers;
 using GLS.Platform.u202323562.Contexts.Assignments.Application.QueryServices;
 using GLS.Platform.u202323562.Contexts.Assignments.Domain.Repositories;
 using GLS.Platform.u202323562.Contexts.Assignments.Domain.Services;
@@ -43,23 +41,12 @@ builder.Services.AddSwaggerGen(options =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<GLSContext>(options =>
 {
-    options.UseMySQL(connectionString);
-
-    if (builder.Environment.IsDevelopment())
-        options.LogTo(Console.WriteLine, LogLevel.Information)
-            .EnableSensitiveDataLogging()
-            .EnableDetailedErrors();
-    else if (builder.Environment.IsProduction())
-        options.LogTo(Console.WriteLine, LogLevel.Error)
-            .EnableDetailedErrors();
+    options.UseMySQL(connectionString ?? throw new InvalidOperationException("Connection string not found"));
 });
 
-// Cortex.Mediator - IMPORTANTE: Registrar antes de los servicios
-builder.Services.AddMediator(options =>
-{
-    // Register event handlers from the assembly
-    options.AddEventHandlersFromAssembly(typeof(DataRecordRegisteredEventHandler).Assembly);
-});
+// MediatR - Registrar handlers automáticamente
+builder.Services.AddMediatR(cfg => 
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
 // Shared
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -73,9 +60,6 @@ builder.Services.AddScoped<IAssignmentsContextFacade, AssignmentsContextFacade>(
 builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
 builder.Services.AddScoped<IDeviceQueryService, DeviceQueryService>();
 builder.Services.AddScoped<IDeviceCommandService, DeviceCommandService>();
-
-// Event Handler - IMPORTANTE: Registrar explícitamente
-builder.Services.AddScoped<DataRecordRegisteredEventHandler>();
 
 var app = builder.Build();
 
