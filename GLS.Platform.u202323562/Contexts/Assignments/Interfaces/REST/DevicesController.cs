@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GLS.Platform.u202323562.Contexts.Assignments.Interfaces.REST;
 
 /// <summary>
-/// REST controller for Device management
+///     REST controller for Device management
 /// </summary>
 [ApiController]
 [Route("api/v1/devices")]
@@ -16,7 +16,7 @@ namespace GLS.Platform.u202323562.Contexts.Assignments.Interfaces.REST;
 public class DevicesController(IDeviceQueryService deviceQueryService) : ControllerBase
 {
     /// <summary>
-    /// Gets all devices
+    ///     Gets all devices
     /// </summary>
     /// <returns>List of all devices</returns>
     /// <response code="200">Returns the list of devices</response>

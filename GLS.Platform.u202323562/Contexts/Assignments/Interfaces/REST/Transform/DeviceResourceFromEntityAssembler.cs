@@ -4,11 +4,11 @@ using GLS.Platform.u202323562.Contexts.Assignments.Interfaces.REST.Resources;
 namespace GLS.Platform.u202323562.Contexts.Assignments.Interfaces.REST.Transform;
 
 /// <summary>
-/// Assembler to transform Device entity to DeviceResource
+///     Assembler to transform Device entity to DeviceResource
 /// </summary>
 /// <remarks>
-/// Excludes audit fields (CreatedDate, UpdatedDate) as per requirements.
-/// Implemented by Oliver Villogas Medina (u202323562)
+///     Excludes audit fields (CreatedDate, UpdatedDate) as per requirements.
+///     Implemented by Oliver Villogas Medina (u202323562)
 /// </remarks>
 public static class DeviceResourceFromEntityAssembler
 {

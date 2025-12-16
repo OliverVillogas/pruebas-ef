@@ -3,6 +3,6 @@
 public enum EOperationMode
 {
     STANDBY = 0,
-    
+
     IGNITION = 1
 }

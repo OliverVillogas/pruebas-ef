@@ -13,14 +13,14 @@ public class GLSContext(DbContextOptions<GLSContext> options) : DbContext(option
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        
+
         builder.ApplyConfigurationsFromAssembly(typeof(GLSContext).Assembly);
-        
+
         builder.ConfigureSnakeCaseNames();
-        
+
         SeedData(builder);
     }
-    
+
     private static void SeedData(ModelBuilder builder)
     {
         builder.Entity<Device>().HasData(
@@ -57,7 +57,7 @@ public class GLSContext(DbContextOptions<GLSContext> options) : DbContext(option
                 IsDeleted = 0
             }
         );
-        
+
         builder.Entity<Device>()
             .OwnsOne(d => d.MacAddress)
             .HasData(

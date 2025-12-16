@@ -12,12 +12,11 @@ public class DeviceCommandService(
 {
     public async Task<Device?> Handle(UpdatePreferredThrustCommand command)
     {
-        
         var device = await deviceRepository.FindByMacAddressAsync(command.MacAddress);
-        
+
         if (device == null)
             return null;
-        
+
         if (device.PreferredThrust != command.NewPreferredThrust)
         {
             device.UpdatePreferredThrust(command.NewPreferredThrust);

@@ -8,12 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace GLS.Platform.u202323562.Contexts.Tracking.Interfaces.REST;
 
 /// <summary>
-/// REST controller for DataRecord management
+///     REST controller for DataRecord management
 /// </summary>
 /// <remarks>
-/// Provides endpoints for registering telemetry data from rocket engines.
-/// Validates device existence through Anti-Corruption Layer before registration.
-/// Implemented by Oliver Villogas Medina (u202323562)
+///     Provides endpoints for registering telemetry data from rocket engines.
+///     Validates device existence through Anti-Corruption Layer before registration.
+///     Implemented by Oliver Villogas Medina (u202323562)
 /// </remarks>
 [ApiController]
 [Route("api/v1/data-records")]
@@ -21,20 +21,19 @@ namespace GLS.Platform.u202323562.Contexts.Tracking.Interfaces.REST;
 public class DataRecordsController(IDataRecordCommandService dataRecordCommandService) : ControllerBase
 {
     /// <summary>
-    /// Registers a new data record from a rocket engine device
+    ///     Registers a new data record from a rocket engine device
     /// </summary>
     /// <param name="resource">Data record information</param>
     /// <returns>Confirmation of successful registration</returns>
     /// <response code="201">Data record created successfully</response>
     /// <response code="400">Invalid data (thrust out of range, invalid date, device not found)</response>
     /// <remarks>
-    /// Business Rules:
-    /// - Target thrust must be between 700.0 and 950.0 kN
-    /// - Device MAC address must exist in ASSIGNMENTS context (validated via ACL)
-    /// - Generated date cannot be in the future
-    /// - Emits DataRecordRegisteredEvent for ASSIGNMENTS context to update preferred thrust
-    /// 
-    /// Implemented by Oliver Villogas Medina (u202323562)
+    ///     Business Rules:
+    ///     - Target thrust must be between 700.0 and 950.0 kN
+    ///     - Device MAC address must exist in ASSIGNMENTS context (validated via ACL)
+    ///     - Generated date cannot be in the future
+    ///     - Emits DataRecordRegisteredEvent for ASSIGNMENTS context to update preferred thrust
+    ///     Implemented by Oliver Villogas Medina (u202323562)
     /// </remarks>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]

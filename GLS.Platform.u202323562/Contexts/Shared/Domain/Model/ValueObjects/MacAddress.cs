@@ -23,7 +23,13 @@ public record MacAddress
 
     public string Value { get; init; }
 
-    public static implicit operator string(MacAddress macAddress) => macAddress.Value;
+    public static implicit operator string(MacAddress macAddress)
+    {
+        return macAddress.Value;
+    }
 
-    public override string ToString() => Value;
+    public override string ToString()
+    {
+        return Value;
+    }
 }

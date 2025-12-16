@@ -16,7 +16,7 @@ public class BaseRepository<TEntity>(GLSContext context)
     public virtual async Task<TEntity?> FindByIdAsync(int id)
     {
         var entity = await context.Set<TEntity>().FindAsync(id);
-        
+
         if (entity is BaseEntity baseEntity && baseEntity.IsDeleted == 1)
             return null;
 

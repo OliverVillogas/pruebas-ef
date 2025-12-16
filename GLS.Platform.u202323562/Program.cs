@@ -1,3 +1,4 @@
+using System.Reflection;
 using GLS.Platform.u202323562.Contexts.Assignments.Application.CommandServices;
 using GLS.Platform.u202323562.Contexts.Assignments.Application.QueryServices;
 using GLS.Platform.u202323562.Contexts.Assignments.Domain.Repositories;
@@ -33,8 +34,8 @@ builder.Services.AddSwaggerGen(options =>
             Email = "u202323562@upc.edu.pe"
         }
     });
-    
-    var xmlFilename = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
@@ -45,7 +46,7 @@ builder.Services.AddDbContext<GLSContext>(options =>
 });
 
 // MediatR - Registrar handlers automáticamente
-builder.Services.AddMediatR(cfg => 
+builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
 // Shared

@@ -2,7 +2,7 @@
 
 public class DeviceNotFoundException : Exception
 {
-    public DeviceNotFoundException(int id) 
+    public DeviceNotFoundException(int id)
         : base($"Device with id {id} not found")
     {
         DeviceId = id;

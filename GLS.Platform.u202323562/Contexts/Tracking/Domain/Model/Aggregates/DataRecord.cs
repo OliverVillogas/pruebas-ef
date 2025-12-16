@@ -6,12 +6,12 @@ using GLS.Platform.u202323562.Contexts.Tracking.Domain.Model.ValueObjects;
 namespace GLS.Platform.u202323562.Contexts.Tracking.Domain.Model.Aggregates;
 
 /// <summary>
-/// DataRecord aggregate root representing telemetry data from rocket engines
+///     DataRecord aggregate root representing telemetry data from rocket engines
 /// </summary>
 /// <remarks>
-/// Contains thrust measurements, operation mode, and engine state information.
-/// Implements business rules for valid thrust ranges (700.0 - 950.0 kN).
-/// Implemented by Oliver Villogas Medina (u202323562)
+///     Contains thrust measurements, operation mode, and engine state information.
+///     Implements business rules for valid thrust ranges (700.0 - 950.0 kN).
+///     Implemented by Oliver Villogas Medina (u202323562)
 /// </remarks>
 public class DataRecord : BaseEntity
 {
@@ -34,13 +34,13 @@ public class DataRecord : BaseEntity
         DateTime generatedAt)
     {
         DeviceMacAddress = deviceMacAddress ?? throw new ArgumentNullException(nameof(deviceMacAddress));
-        
+
         if (targetThrust < MinTargetThrust || targetThrust > MaxTargetThrust)
             throw InvalidDataRecordException.InvalidTargetThrust(targetThrust, MinTargetThrust, MaxTargetThrust);
-        
+
         if (currentThrust < MinCurrentThrust)
             throw InvalidDataRecordException.InvalidCurrentThrust(currentThrust);
-        
+
         if (generatedAt > DateTime.UtcNow)
             throw InvalidDataRecordException.InvalidGeneratedDate(generatedAt);
 

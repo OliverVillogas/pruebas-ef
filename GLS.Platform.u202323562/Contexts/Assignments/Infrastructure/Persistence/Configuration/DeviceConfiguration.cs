@@ -12,20 +12,20 @@ public class DeviceConfiguration : IEntityTypeConfiguration<Device>
 
         builder.HasKey(d => d.Id);
         builder.Property(d => d.Id).ValueGeneratedOnAdd();
-        
+
         builder.Property(d => d.CreatedDate).IsRequired();
         builder.Property(d => d.UpdatedDate).IsRequired(false);
-        
+
         builder.Property(d => d.IsDeleted)
             .IsRequired()
             .HasDefaultValue(0);
-        
+
         builder.Property(d => d.MissionId).IsRequired();
-        
+
         builder.Property(d => d.PreferredThrust)
             .HasColumnType("decimal(18,2)")
             .IsRequired();
-        
+
         builder.OwnsOne(d => d.MacAddress, mac =>
         {
             mac.Property(m => m.Value)

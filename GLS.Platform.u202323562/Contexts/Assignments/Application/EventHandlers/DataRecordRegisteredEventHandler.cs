@@ -1,17 +1,17 @@
-﻿using MediatR;
-using GLS.Platform.u202323562.Contexts.Assignments.Domain.Repositories;
+﻿using GLS.Platform.u202323562.Contexts.Assignments.Domain.Repositories;
 using GLS.Platform.u202323562.Contexts.Shared.Domain.Repositories;
 using GLS.Platform.u202323562.Contexts.Tracking.Domain.Events;
+using MediatR;
 
 namespace GLS.Platform.u202323562.Contexts.Assignments.Application.EventHandlers;
 
 /// <summary>
-/// Event handler that listens to DataRecordRegisteredEvent and updates device preferred thrust.
+///     Event handler that listens to DataRecordRegisteredEvent and updates device preferred thrust.
 /// </summary>
 /// <remarks>
-/// When a data record is registered in the TRACKING context, this handler updates
-/// the preferred thrust of the corresponding device in ASSIGNMENTS context if the value differs.
-/// Author: Oliver Villogas Medina (u202323562)
+///     When a data record is registered in the TRACKING context, this handler updates
+///     the preferred thrust of the corresponding device in ASSIGNMENTS context if the value differs.
+///     Author: Oliver Villogas Medina (u202323562)
 /// </remarks>
 public class DataRecordRegisteredEventHandler : INotificationHandler<DataRecordRegisteredEvent>
 {
@@ -27,7 +27,7 @@ public class DataRecordRegisteredEventHandler : INotificationHandler<DataRecordR
     }
 
     /// <summary>
-    /// Handles the DataRecordRegisteredEvent by updating device preferred thrust.
+    ///     Handles the DataRecordRegisteredEvent by updating device preferred thrust.
     /// </summary>
     /// <param name="notification">Event containing device MAC address and target thrust</param>
     /// <param name="cancellationToken">Cancellation token</param>
@@ -35,7 +35,7 @@ public class DataRecordRegisteredEventHandler : INotificationHandler<DataRecordR
     {
         // Find device by MAC Address
         var device = await _deviceRepository.FindByMacAddressAsync(notification.DeviceMacAddress);
-        
+
         if (device == null)
             return; // Device not found, ignore event silently
 
